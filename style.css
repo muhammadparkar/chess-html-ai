@@ -1,65 +1,228 @@
 body {
-    background-color: black; /* Set the background to black */
-    color: white; /* Set the text color to white */
+    background-color: #222; /* Slightly softer black for better aesthetics */
+    color: white;
+    font-family: 'Arial', sans-serif;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Full viewport height for centering */
-    margin: 0;
 }
 
 .container {
     display: flex;
-    align-items: center; /* Center vertically */
+    align-items: stretch;
     justify-content: center;
+    width: 90%;
+    max-width: 1200px;
 }
 
-.board {
-    width: 600px; /* Keep the board size */
-    margin-right: 20px; /* Add spacing between the board and move history */
+.chess-board {
+    width: 500px;
+    height: 500px;
+    margin-left: 2rem;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
 }
 
 .info {
-    width: 600px; /* Match the board width */
-    margin: auto;
+    margin-right: 2rem;
+    width: 300px;
+    padding: 20px;
+    background-color: #333;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+#search-depth {
+    background-color: #444;
+    color: white;
+    padding: 8px;
+    margin: 8px 0 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.visualization-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 10px 0;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.visualization-button:hover {
+    background-color: #45a049;
 }
 
 .move-history {
-    max-height: 600px; /* Match the board height */
-    overflow-y: scroll;
-    background-color: black; /* Ensure the move history background matches */
-    color: white; /* Ensure the text is white */
-    width: 200px; /* Set a fixed width for the move history */
-    padding: 10px;
-    border: 1px solid white; /* Optional: Add a border for better visibility */
+    max-height: 250px;
+    overflow-y: auto;
+    background-color: #444;
+    color: white;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 4px;
+    border: 1px solid #555;
+    font-family: monospace;
+    font-size: 14px;
 }
 
-/* Add these styles to your existing CSS file */
+/* Custom scrollbar for move history */
+.move-history::-webkit-scrollbar {
+    width: 8px;
+}
 
+.move-history::-webkit-scrollbar-track {
+    background: #333;
+    border-radius: 4px;
+}
+
+.move-history::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 4px;
+}
+
+.move-history::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+/* Move history container styling */
+#move-history {
+    max-height: 250px;
+    overflow-y: auto;
+    background-color: #444;
+    color: white;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 4px;
+    border: 1px solid #555;
+    font-family: monospace;
+    font-size: 14px;
+    scrollbar-width: thin;
+    scrollbar-color: #666 #333;
+}
+
+/* Custom scrollbar for move history */
+#move-history::-webkit-scrollbar {
+    width: 8px;
+}
+
+#move-history::-webkit-scrollbar-track {
+    background: #333;
+    border-radius: 4px;
+}
+
+#move-history::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 4px;
+}
+
+#move-history::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+/* Move history table styling */
+.move-history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.move-number {
+    color: #aaa;
+    width: 30px;
+    text-align: right;
+    padding-right: 8px;
+}
+
+.move {
+    padding: 3px 8px;
+}
+
+.white-move {
+    color: #fff;
+}
+
+.black-move {
+    color: #ccc;
+}
+
+/* Evaluation styles */
 .evaluation-container {
     max-height: 300px;
     overflow-y: auto;
     font-family: Arial, sans-serif;
+    margin-top: 15px;
+    background-color: #333;
+    border-radius: 4px;
+    padding: 10px;
 }
 
 .evaluation-container h3 {
     margin-top: 0;
     margin-bottom: 10px;
+    font-size: 16px;
+    color: #4CAF50;
+}
+
+.evaluation-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
 .evaluation-table thead {
-    background-color: #f2f2f2;
+    background-color: #444;
 }
 
 .evaluation-table th {
     position: sticky;
     top: 0;
-    background-color: #f2f2f2;
+    background-color: #444;
+    color: white;
+    padding: 8px;
+    text-align: left;
+}
+
+.evaluation-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid #555;
 }
 
 /* For a more detailed view */
 .move-details {
     font-size: 0.9em;
-    color: #666;
+    color: #aaa;
     margin-top: 4px;
+}
+
+/* Stats styling */
+.info span {
+    margin: 4px 0;
+    font-size: 14px;
+}
+
+.info span span {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+/* Visualization container styling */
+.visualization-container {
+    background-color: #333;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+}
+
+.visualization-container h3 {
+    color: #4CAF50;
+    margin-top: 0;
 }
