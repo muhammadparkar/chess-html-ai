@@ -319,3 +319,125 @@ var cfg = {
     onSnapEnd: onSnapEnd
 };
 board = ChessBoard('board', cfg);
+
+/**
+ * MinimaxNode class to represent nodes in the decision tree.
+ */
+class MinimaxNode {
+    constructor(board, move = null, score = null, depth = 0) {
+        this.board = JSON.parse(JSON.stringify(board)); // Deep copy of the board
+        this.move = move;
+        this.score = score;
+        this.depth = depth;
+        this.children = [];
+        this.isMaximizing = null; // Set based on the player's turn
+    }
+
+    addChild(child) {
+        this.children.push(child);
+    }
+}
+
+/**
+ * Minimax algorithm with tree visualization.
+ */
+function minimaxWithTree(game, depth, isMaximizingPlayer, alpha, beta, node = null) {
+    if (depth === 0 || game.game_over()) {
+        const score = evaluateBoard(game.board());
+        if (node) node.score = score;
+        return score;
+    }
+
+    const moves = game.ugly_moves();
+    if (isMaximizingPlayer) {
+        let maxEval = -Infinity;
+        for (const move of moves) {
+            game.ugly_move(move);
+            const childNode = new MinimaxNode(game.board(), move, null, node ? node.depth + 1 : 0);
+            if (node) node.addChild(childNode);
+
+            const eval = minimaxWithTree(game, depth - 1, false, alpha, beta, childNode);
+            maxEval = Math.max(maxEval, eval);
+            alpha = Math.max(alpha, eval);
+
+            game.undo();
+            if (beta <= alpha) break;
+        }
+        if (node) node.score = maxEval;
+        return maxEval;
+    } else {
+        let minEval = Infinity;
+        for (const move of moves) {
+            game.ugly_move(move);
+            const childNode = new MinimaxNode(game.board(), move, null, node ? node.depth + 1 : 0);
+            if (node) node.addChild(childNode);
+
+            const eval = minimaxWithTree(game, depth - 1, true, alpha, beta, childNode);
+            minEval = Math.min(minEval, eval);
+            beta = Math.min(beta, eval);
+
+            game.undo();
+            if (beta <= alpha) break;
+        }
+        if (node) node.score = minEval;
+        return minEval;
+    }
+}
+
+/**
+ * Draw the Minimax tree visualization.
+ */
+function drawTree(ctx, node, x, y, width, levelHeight, maxDepth) {
+    if (!node || node.depth > maxDepth) return;
+
+    const nodeX = x + width / 2;
+    const nodeY = y;
+
+    // Draw the node
+    ctx.beginPath();
+    ctx.arc(nodeX, nodeY, 20, 0, 2 * Math.PI);
+    ctx.fillStyle = node.isMaximizing ? 'red' : 'blue';
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw the score
+    ctx.fillStyle = 'white';
+    ctx.fillText(node.score !== null ? node.score : '', nodeX - 10, nodeY + 5);
+
+    // Draw children
+    const childWidth = width / node.children.length;
+    for (let i = 0; i < node.children.length; i++) {
+        const child = node.children[i];
+        const childX = x + i * childWidth;
+        const childY = y + levelHeight;
+
+        // Draw the connecting line
+        ctx.beginPath();
+        ctx.moveTo(nodeX, nodeY + 20);
+        ctx.lineTo(childX + childWidth / 2, childY - 20);
+        ctx.stroke();
+
+        // Recursively draw the child
+        drawTree(ctx, child, childX, childY, childWidth, levelHeight, maxDepth);
+    }
+}
+
+/**
+ * Integrate the tree visualization into the game loop.
+ */
+function visualizeMinimaxTree(game, depth) {
+    const canvas = document.getElementById('minimax-tree');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const rootNode = new MinimaxNode(game.board(), null, null, 0);
+    minimaxWithTree(game, depth, true, -Infinity, Infinity, rootNode);
+
+    drawTree(ctx, rootNode, 0, 50, canvas.width, 100, depth);
+}
+
+// Example usage in the game loop
+document.getElementById('visualize-button').addEventListener('click', () => {
+    const depth = parseInt(document.getElementById('search-depth').value, 10);
+    visualizeMinimaxTree(game, depth);
+});
